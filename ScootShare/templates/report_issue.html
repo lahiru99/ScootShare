@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Scooter Issues</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .navbar {
+            background-color: #585f66;
+        }
+
+        .navbar .nav-link {
+            color: #fff;
+            transition: color 0.3s;
+        }
+
+        .navbar .nav-link:hover {
+            color: #f4f4f4;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        button {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #585f66;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <h3 class="float-md-start mb-0">
+            <img src="/static/images/logo.jpg" alt="ScootShare Logo" class="img-fluid" style="height: 50px;">
+            ScootShare
+        </h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Booking</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <h2 class="text-center mb-4">Report a Scooter Issue</h2>
+        <form action="/submit_issue" method="post" id="report_issue-form">
+            <label for="scooter_id">Scooter ID:</label>
+            <input type="text" name="scooter_id" id="scooter_id" required>
+
+            <label for="description">Describe the Issue:</label>
+            <textarea name="description" id="description" rows="4" required></textarea>
+
+            <label for="time_of_report">Time Of Report:</label>
+            <input id="time_of_report" type="datetime-local" required name="time_of_report" />
+
+            <label for="staus">Status:</label>
+            <input name="status" id="status" value="To Be Repaired" readonly></label>
+
+            <button type="submit">Report Issue</button>
+        </form>
+    </main>
+
+    <script>
+        document.getElementById("report_issue-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const url = "/api/new_report";
+            const formData = new FormData(this);
+
+            const formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            // Log the formData to check its contents
+            console.log(formDataObject);
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formDataObject),
+            })
+                .then(async (response) => {
+                    if (response.status === 200) {
+                        const reportData = await response.json();
+                        console.log("Success:", reportData);
+                        alert("Report submitted successfully!");
+                        window.location.href = "/booking";
+                    } else {
+                        const errorMessage = await response.text();
+                        console.error("Error:", response.status, errorMessage);
+                        alert("Error submitting report. Please try again.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again.");
+                });
+        });
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

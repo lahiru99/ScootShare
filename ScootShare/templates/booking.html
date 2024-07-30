@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scooter Booking</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .scooter-image {
+            width: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <h3 class="float-md-start mb-0">
+            <img src="/static/images/logo.jpg" alt="ScootShare Logo" class="img-fluid" style="height: 50px;">
+            ScootShare
+        </h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('site.landing_view') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('site.login_view') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('site.register_view') }}">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('site.report_issue') }}">Report Issue</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="logout-btn">Logout</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body">
+            <h5 style="color: white;" class="card-title">Welcome, <span id="username"></span></h5>
+            <p style="color: white;" class="card-text">Balance: $<span id="balance">{{ balance }}</span></p>
+        </div>
+    </nav>
+
+    <!-- Carousel Banner -->
+    <style>
+        .carousel-inner {
+            height: 100%;
+        }
+
+        .carousel-image {
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+
+    <div class="carousel-container">
+        <div id="carouselBanner" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/static/images/banner5.png" class="d-block w-100 carousel-image" alt="Banner 1">
+                </div>s
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Latest Scooters</h5>
+                    <p>Check out our latest additions!</p>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselBanner" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselBanner" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="container mt-4">
+        <h4>Top Up Your Balance</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <input type="number" id="top-up-input" class="form-control" placeholder="Enter amount to top up">
+            </div>
+            <div class="col-md-6">
+                <button id="top-up-btn" class="btn btn-primary">Top Up</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scooters List -->
+    <div class="container mt-4">
+        <div class="row">
+            {% for scooter in available_scooters %}
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="../static/images/scooter.jpg" alt="Scooter Image" class="card-img-top scooter-image">
+                    <div class="card-body">
+                        <h5>Scooter ID: {{ scooter.scooter_id }}</h5>
+                        <p>Status: {{ scooter.status }}</p>
+                        <p>Make: {{ scooter.make }}</p>
+                        <p>Color: {{ scooter.color }}</p>
+                        <p>Location: {{ scooter.location }}</p>
+                        <p>Power: {{ scooter.power }}</p>
+                        <p>Cost: {{ scooter.cost }}</p>
+                        <!-- Add an input field for start_time -->
+                        <input type="datetime-local" id="start-time-{{ scooter.scooter_id }}" class="form-control"
+                            placeholder="Select Start Time">
+                        <button class="btn btn-primary book-button" data-scooter-id="{{ scooter.scooter_id }}"
+                            data-booking-id="{{ scooter.booking_id }}">Book</button>
+                        <button class="btn btn-primary cancel-book-button"
+                            data-scooter-id="{{ scooter.scooter_id }}">Cancel Book</button>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const username = sessionStorage.getItem('username');
+
+            // Check if the user is logged in
+            if (username) {
+                fetch("/balance", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                    }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(text || "Error topping up. Please try again later.");
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.message) {
+                            alert(data.message);
+                            if (data.message.includes("Your balance is:")) {
+                                const newBalance = data.message.split("Your balance is:")[1].trim();
+                                document.getElementById("balance").textContent = newBalance;
+                            }
+                        } else {
+                            throw new Error("Unexpected response from the server.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error topping up:", error.message);
+                        alert(error.message);
+                    });
+            }
+        });
+
+        function handleTopUp() {
+            const topUpAmount = parseFloat(document.getElementById("top-up-input").value);
+            if (isNaN(topUpAmount) || topUpAmount <= 0) {
+                alert("Please enter a valid top-up amount.");
+                return;
+            }
+
+            const username = sessionStorage.getItem('username');
+            if (!username) {
+                alert("Please login first.");
+                return;
+            }
+
+            fetch("/top-up", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    top_up: topUpAmount
+                }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || "Error topping up. Please try again later.");
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.message) {
+                        alert(data.message);
+                        if (data.message.includes("New balance:")) {
+                            const newBalance = data.message.split("New balance:")[1].trim();
+                            document.getElementById("balance").textContent = newBalance;
+                        }
+                    } else {
+                        throw new Error("Unexpected response from the server.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error topping up:", error.message);
+                    alert(error.message);
+                });
+        }
+
+        document.getElementById("top-up-btn").addEventListener("click", handleTopUp);
+
+        function updateUI(username, balance) {
+            // Update username
+            const usernameElement = document.getElementById('username');
+            usernameElement.textContent = username;
+
+            // Update balance if available
+            if (balance !== undefined) {
+                const balanceElement = document.getElementById('balance');
+                console.log("Updating balance:", balance);
+                balanceElement.textContent = balance;
+            }
+        }
+
+        function formatDateToCustomString(date) {
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function makeBooking(scooter_id) {
+            const start_time_input = document.getElementById(`start-time-${scooter_id}`);
+            const start_time = start_time_input.value;
+
+            // Create a luxon DateTime object from the start_time string
+            const datetime_object = luxon.DateTime.fromISO(start_time);
+
+            // Check if datetime_object is a valid DateTime object
+            if (!datetime_object.isValid) {
+                alert("Please select a valid start time.");
+                return;
+            }
+
+            // Now, datetime_object is a luxon DateTime object
+            console.log(datetime_object);
+
+            const bookingData = {
+                scooter_id: scooter_id,
+                username: sessionStorage.getItem('username'), // Use the logged-in username as the 'username'
+                start_time: datetime_object.toISO(), // Convert to ISO string format
+                duration: 45, // Adjust as needed
+                cost: 1.0, // Adjust as needed
+                status: "Available", // Adjust as needed
+            };
+
+            // Make a POST request to your API endpoint
+            fetch("/api/add_booking", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(bookingData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the API, e.g., display a success message or handle errors
+                    console.log(data); // You can replace this with your desired handling logic
+
+                    // If the booking was successful, find the corresponding "Book" button and update its text
+                    if (data.success) {
+                        const bookingId = data.bookingId; // Replace with the actual response property name
+
+                        // Find the "Book" button with the matching data-booking-id attribute
+                        const bookButton = document.querySelector(`[data-booking-id="${bookingId}"]`);
+
+                        // Update the button text to "Booked"
+                        if (bookButton) {
+                            bookButton.textContent = "Booked";
+                            bookButton.disabled = true; // Optionally, disable the button
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error making booking:", error);
+                });
+        }
+        function cancelBooking(scooter_id) {
+            // Create an object with the booking data
+            const bookingData = {
+                booking_id: 1,
+                location: "Location A",
+                scooter_id: scooter_id,
+                username: sessionStorage.getItem('username'),
+                duration: 40, // Pass duration as an integer, not a string
+                start_time: "2023-01-28 14:00:00", // Leave start_time as a string
+                cost: 1,
+                status: status,
+            };
+            // Make a POST request to your API endpoint to cancel the booking
+            fetch("/api/cancel_booking", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(bookingData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the API, e.g., display a success message or handle errors
+                    console.log(data); // You can replace this with your desired handling logic
+                })
+                .catch(error => {
+                    console.error("Error canceling booking:", error);
+                });
+        }
+        function handleBookingButtonClick(event) {
+            const button = event.target;
+            const scooter_id = button.getAttribute("data-scooter-id");
+
+            if (button.classList.contains("book-button")) {
+                makeBooking(scooter_id);
+            } else if (button.classList.contains("cancel-book-button")) {
+                cancelBooking(scooter_id);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const username = sessionStorage.getItem('username');
+            const balance = sessionStorage.getItem('balance');
+
+            // Update the UI with username and balance
+            updateUI(username, balance);
+
+            // Add click event listener to all "Book" and "Cancel Book" buttons
+            const bookButtons = document.querySelectorAll(".book-button, .cancel-book-button");
+            bookButtons.forEach(button => {
+                button.addEventListener("click", handleBookingButtonClick);
+            });
+
+            // Parse start_time and update the UI
+            const startTimes = document.querySelectorAll('[data-start-time]');
+            startTimes.forEach(startTimeElement => {
+                const startTimeString = startTimeElement.getAttribute('data-start-time');
+                const startTimeDate = new Date(startTimeString);
+
+                // Format the date as needed (e.g., to display it in a different format)
+                const formattedStartTime = startTimeDate.toLocaleString(); // Adjust the format as needed
+
+                // Update the UI with the formatted start time
+                startTimeElement.textContent = `Start Time: ${formattedStartTime}`;
+            });
+        });
+
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            // Clear the sessionStorage
+            sessionStorage.clear();
+
+            // Redirect to the login page or landing page after logout
+            window.location.href = "{{ url_for('site.landing_view') }}";
+        });
+    </script>
+
+
+    <!-- Search for ride -->
+    <style>
+        .step-container {
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .step-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .step-content {
+            flex-grow: 1;
+
+        }
+
+        .padded-container {
+            padding-top: 50px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #6d6363;
+            color: #fff;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.0.2/luxon.min.js"></script>
+
+</body>
+
+</html>

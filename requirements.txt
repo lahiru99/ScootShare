@@ -1,0 +1,7 @@
+flask-marshmallow==0.15.0
+Flask-SQLAlchemy==3.1.1
+Flask==2.3.3
+flask_restful==0.3.10
+requests==2.31.0
+bcrypt==4.0.1
+pymysql==1.1.0

@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .navbar,
+        footer {
+            background-color: #585f66;
+        }
+
+        .navbar .nav-link:hover {
+            color: #f4f4f4;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-bottom: 1rem;
+        }
+
+        label,
+        input,
+        button {
+            margin-bottom: 0.5rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+
+        .functionality-card {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            margin: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .functionality-card:hover {
+            transform: scale(1.05);
+        }
+
+        .functionality-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 20%;
+            background-color: #0E7C86;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 20px 30px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #0a5a62;
+        }
+
+        .main-content {
+            background-color: #E9F0F4;
+            padding: 20px;
+        }
+
+        .main-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .widget {
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        .stat-icon {
+            font-size: 2em;
+            margin-right: 20px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:not(:last-child) {
+            margin-right: 20px;
+        }
+
+        .widget {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .widget {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .functionality-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .functionality-item {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .functionality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        <h3 class="float-md-start mb-0">
+            <img src="/static/images/logo.jpg" alt="ScootShare Logo" class="img-fluid" style="height: 50px;">
+            ScootShare
+        </h3>
+        <h2 class="text-center mb-4">Dashboard</h2>
+
+        <!-- Container for Reports -->
+        <div id="reports-container">
+            <h3>Reports</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Scooter ID</th>
+                        <th>Description</th>
+                        <th>Time Of Report</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Container for Usages -->
+        <div id="usage-container">
+            <h3>Scooter Usage History</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Location</th>
+                        <th>Scooter ID</th>
+                        <th>Username</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="usage-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Container for Repairs -->
+        <div id="repair-container">
+            <h3>Repairs</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Repairs ID</th>
+                        <th>Scooter ID</th>
+                        <th>Description</th>
+                        <th>Linked Report ID</th>
+                        <th>Time Of Repair</th>
+                    </tr>
+                </thead>
+                <tbody id="repair-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Container for Bookings -->
+        <div id="bookings-container">
+            <h3>Bookings</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Location</th>
+                        <th>Scooter ID</th>
+                        <th>Username</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Container for Scooters -->
+        <div id="scooters-container">
+            <h3>Scooters</h3>
+            <table class="table table-bordered">
+                <thead>
+
+                </thead>
+                <tbody id="scooter-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            <button onclick="addScooter()">Add Scooter</button>
+            <button onclick="editScooter()">Edit Scooter</button>
+            <button onclick="removeScooter()">Remove Scooter</button>
+            <button onclick="reportIssue()">Report Issue</button>
+        </div>
+
+        <!-- Container for Customers -->
+        <div id="customers-container">
+            <h3>Customers</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="customer-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            <button onclick="addCustomer()">Add Customer</button>
+            <button onclick="editCustomer()">Edit Customer</button>
+            <button onclick="removeCustomer()">Remove Customer</button>
+        </div>
+
+    </div>
+
+    <script>
+        function fetchDataAndPopulateContainers() {
+            // Fetch reports
+            fetch("/api/all_reports")
+                .then(response => response.json())
+                .then(reports => {
+                    const reportTableBody = document.getElementById("report-table-body");
+                    reportTableBody.innerHTML = generateHTMLForReports(reports);
+                })
+                .catch(error => {
+                    console.error("Error fetching reports:", error);
+                });
+            // Fetch repairs
+            fetch("/api/all_repairs")
+                .then(response => response.json())
+                .then(repairs => {
+                    const repairTableBody = document.getElementById("repair-table-body");
+                    repairTableBody.innerHTML = generateHTMLForRepairs(repairs);
+                })
+                .catch(error => {
+                    console.error("Error fetching repairs:", error);
+                });
+            // Fetch bookings
+            fetch("/api/all_bookings")
+                .then(response => response.json())
+                .then(bookings => {
+                    const bookingTableBody = document.getElementById("booking-table-body");
+                    bookingTableBody.innerHTML = generateHTMLForBookings(bookings);
+                })
+                .catch(error => {
+                    console.error("Error fetching bookings:", error);
+                });
+            // Fetch Usage
+            fetch("/api/all_bookings")
+                .then(response => response.json())
+                .then(usages => {
+                    const completeBookings = usages.filter(usage => usage.status === "Complete");
+                    const usageTableBody = document.getElementById("usage-table-body");
+                    usageTableBody.innerHTML = generateHTMLForBookings(completeBookings);
+                })
+                .catch(error => {
+                    console.error("Error fetching usages:", error);
+                });
+
+            // Fetch scooters
+            fetch("/api/all_scooters")
+                .then(response => response.json())
+                .then(scooters => {
+                    const scooterTableBody = document.getElementById("scooter-table-body");
+                    scooterTableBody.innerHTML = generateHTMLForScooters(scooters);
+                })
+                .catch(error => {
+                    console.error("Error fetching scooters:", error);
+                });
+
+
+            // Fetch customers
+            fetch("/api/all_customers")
+                .then(response => response.json())
+                .then(customers => {
+                    const customerTableBody = document.getElementById("customer-table-body");
+                    customerTableBody.innerHTML = generateHTMLForCustomers(customers);
+                })
+                .catch(error => {
+                    console.error("Error fetching customers:", error);
+                });
+        }
+
+
+        // Call the function to fetch and populate data when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchDataAndPopulateContainers();
+        });
+
+        function generateHTMLForReports(reports) {
+            let html = "";
+            reports.forEach(report => {
+                html += `
+            <tr>
+                <td>${report.report_id}</td>
+                <td>${report.scooter_id}</td>
+                <td>${report.description}</td>
+                <td>${report.time_of_report}</td>
+                <td>${report.status}</td>
+            </tr>
+        `;
+            });
+            return html;
+        }
+        function generateHTMLForRepairs(repairs) {
+            let html = "";
+            repairs.forEach(repair => {
+                html += `
+            <tr>
+                <td>${repair.repair_id}</td>
+                <td>${repair.scooter_id}</td>
+                <td>${repair.description}</td>
+                <td>${repair.linked_report_id}</td>
+                <td>${repair.time_of_repair}</td>
+            </tr>
+        `;
+            });
+            return html;
+        }
+        function generateHTMLForBookings(bookings) {
+            let html = "";
+            bookings.forEach(booking => {
+                html += `
+            <tr>
+                <td>${booking.booking_id}</td>
+                <td>${booking.location}</td>
+                <td>${booking.scooter_id}</td>
+                <td>${booking.username}</td>
+                <td>${booking.start_time}</td>
+                <td>${booking.duration}</td>
+                <td>${booking.cost}</td>
+                <td>${booking.status}</td>
+            </tr>
+        `;
+            });
+            return html;
+        }
+
+        function generateHTMLForUsages(usages) {
+            let html = "";
+            usages.forEach(usage => {
+                html += `
+            <tr>
+                <td>${usage.booking_id}</td>
+                <td>${usage.location}</td>
+                <td>${usage.scooter_id}</td>
+                <td>${usage.username}</td>
+                <td>${usage.start_time}</td>
+                <td>${usage.duration}</td>
+                <td>${usage.cost}</td>
+                <td>${usage.status}</td>
+            </tr>
+        `;
+            });
+            return html;
+        }
+
+        let scooters = [];
+        function generateHTMLForScooters(scooters) {
+            let html = "<table class='table table-bordered'>";
+            html += "<thead><tr><th>Scooter ID</th><th>Status</th><th>Make</th><th>Color</th><th>Location</th><th>Power</th><th>Cost</th></tr></thead>";
+            html += "<tbody>";
+
+            scooters.forEach(scooter => {
+                html += "<tr>";
+                html += `<td>${scooter.scooter_id}</td>`;
+                html += `<td>${scooter.status}</td>`;
+                html += `<td>${scooter.make}</td>`;
+                html += `<td>${scooter.color}</td>`;
+                html += `<td>${scooter.location}</td>`;
+                html += `<td>${scooter.power}</td>`;
+                html += `<td>${scooter.cost}</td>`;
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+            return html;
+        }
+
+        function generateHTMLForCustomers(customers) {
+            let html = "";
+            customers.forEach(customer => {
+                html += `
+            <tr>
+                <td>${customer.username}</td>
+                <td>${customer.first_name}</td>
+                <td>${customer.last_name}</td>
+                <td>${customer.phone_number}</td>
+                <td>${customer.email_address}</td>
+                <td>${customer.balance}</td>
+            </tr>
+        `;
+            });
+            return html;
+        }
+
+        function addCustomer() {
+            const username = prompt("Enter username:");
+            const firstName = prompt("Enter first name:");
+            const lastName = prompt("Enter last name:");
+            const password = prompt("Enter Password");
+            const phone_number = prompt("Enter Phone Number:");
+            const email_address = prompt("Enter Email:");
+            const balance = parseFloat(prompt("Enter balance:"));
+
+            if (username && firstName && lastName && password && phone_number && email_address && !isNaN(balance)) {
+                const customerData = {
+                    username,
+                    first_name: firstName,
+                    last_name: lastName,
+                    password,
+                    phone_number,
+                    email_address,
+                    balance,
+                };
+
+                fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(customerData),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+                    })
+                    .catch((error) => {
+                        console.error("Error adding customer:", error);
+                        alert("An error occurred while adding the customer.");
+                    });
+            } else {
+                alert("Invalid input for customer data. Please check and try again.");
+            }
+        }
+        function editCustomer() {
+            const username = prompt("Enter username of the customer to edit:");
+            const firstName = prompt("Enter first name to edit:");
+            const lastName = prompt("Enter last name to edit:");
+            const phone_number = prompt("Enter Phone Number to edit:");
+            const email_address = prompt("Enter Email to edit:");
+
+            if (username) {
+                // Prompt for updated customer data and create a customerData object
+                const customerData = {
+                    username,
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone_number,
+                    email_address
+                };
+
+                fetch("/api/edit_customer", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(customerData),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+                    })
+                    .catch((error) => {
+                        console.error("Error editing customer:", error);
+                        alert("An error occurred while editing the customer.");
+                    });
+            }
+        }
+
+
+        function removeCustomer() {
+            const username = prompt("Enter username of the customer to remove:");
+
+            if (username) {
+                fetch(`/api/remove_customer?username=${username}`, {
+                    method: "DELETE",
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+                    })
+                    .catch((error) => {
+                        console.error("Error removing customer:", error);
+                        alert("An error occurred while removing the customer.");
+                    });
+            }
+        }
+
+        function addScooter() {
+            const status = prompt("Enter status:");
+            const make = prompt("Enter make:");
+            const color = prompt("Enter color:");
+            const location = prompt("Enter location:");
+            const power = parseFloat(prompt("Enter power remaining:"));
+            const cost = parseFloat(prompt("Enter cost per minute:"));
+
+            if (status && make && color && location && !isNaN(power) && !isNaN(cost)) {
+                const scooterData = {
+                    status,
+                    make,
+                    color,
+                    location,
+                    power,
+                    cost,
+                };
+
+                fetch("/api/add_scooter", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(scooterData),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+
+                        // Push the new scooter data into the scooters array
+                        scooters.push(scooterData);
+
+                        // Update the HTML content for the scooters container
+                        const scootersContainer = document.getElementById("scooters-container");
+                        const scootersHTML = generateHTMLForScooters(scooters);
+                        scootersContainer.innerHTML = scootersHTML;
+                    })
+                    .catch((error) => {
+                        console.error("Error adding scooter:", error);
+                        alert("An error occurred while adding the scooter.");
+                    });
+            }
+        }
+
+        function editScooter() {
+            const scooterId = prompt("Enter the ID of the scooter to edit:");
+
+            if (scooterId) {
+                // Prompt for updated scooter data and create a scooterData object
+                const status = prompt("Enter updated status:");
+                const make = prompt("Enter updated make:");
+                const color = prompt("Enter updated color:");
+                const location = prompt("Enter updated location:");
+                const power = parseFloat(prompt("Enter updated power remaining:"));
+                const cost = parseFloat(prompt("Enter updated cost per minute:"));
+
+                if (status && make && color && location && !isNaN(power) && !isNaN(cost)) {
+                    const scooterData = {
+                        scooter_id: scooterId,
+                        status,
+                        make,
+                        color,
+                        location,
+                        power,
+                        cost,
+                    };
+
+                    fetch("/api/edit_scooter", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(scooterData),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            alert(data); // Display a success message or handle the response as needed
+                        })
+                        .catch((error) => {
+                            console.error("Error editing scooter:", error);
+                            alert("An error occurred while editing the scooter.");
+                        });
+                } else {
+                    alert("Invalid input for scooter data. Please check and try again.");
+                }
+            }
+        }
+
+        function removeScooter() {
+            const scooterId = prompt("Enter the ID of the scooter to remove:");
+
+            if (scooterId) {
+                fetch(`/api/remove_scooter?scooter_id=${scooterId}`, {
+                    method: "DELETE",
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+                    })
+                    .catch((error) => {
+                        console.error("Error removing scooter:", error);
+                        alert("An error occurred while removing the scooter.");
+                    });
+            }
+        }
+
+        function reportIssue() {
+            const scooterId = prompt("Enter the ID of the scooter with the issue:");
+            const description = prompt("Enter a description of the issue:");
+
+            if (scooterId && description) {
+                const reportData = {
+                    scooter_id: scooterId,
+                    description: description,
+                    time_of_report: new Date().toISOString(), // You can adjust this as needed
+                    status: "Open", // You can set an initial status
+                };
+
+                fetch("/api/new_report", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(reportData),
+                })
+                    .then((response) => response.text())
+                    .then((data) => {
+                        alert(data); // Display a success message or handle the response as needed
+                    })
+                    .catch((error) => {
+                        console.error("Error reporting issue:", error);
+                        alert("An error occurred while reporting the issue.");
+                    });
+            } else {
+                alert("Invalid input for issue report. Please check and try again.");
+            }
+        }
+    </script>
+
+
+
+    <style>
+        .functionality-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .functionality-item {
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+
+
+    <style>
+        .functionality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+    </style>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

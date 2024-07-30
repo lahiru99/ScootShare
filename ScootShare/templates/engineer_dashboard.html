@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineer Dashboard</title>
+    <link rel="stylesheet" href="/static/css/engineer.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<style>
+    /* Dark Mode Styles */
+    [data-theme="dark"] {
+        background-color: #121212;
+        color: #ffffff;
+    }
+
+    [data-theme="dark"] nav {
+        background-color: #333;
+    }
+
+    [data-theme="dark"] main {
+        background-color: #1f1f1f;
+    }
+
+    [data-theme="dark"] footer {
+        background-color: #333;
+    }
+
+    [data-theme="dark"] section {
+        background-color: #2c2c2c;
+        color: #e0e0e0;
+    }
+
+    [data-theme="dark"] .navbar-light {
+        background-color: #333 !important;
+    }
+
+    [data-theme="dark"] .navbar-light .navbar-nav .nav-link {
+        color: #e0e0e0 !important;
+    }
+
+    footer {
+        text-align: center;
+        padding: 1rem 0;
+        background-color: #585f66;
+        color: #fff;
+    }
+</style>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <h3 class="float-md-start mb-0">
+            <img src="/static/images/logo.jpg" alt="ScootShare Logo" class="img-fluid" style="height: 50px;">
+            ScootShare
+        </h3>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        <!-- Container for Scooters -->
+        <div id="scooters-container">
+            <h3>Scooters</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    </tr>
+                </thead>
+                <tbody id="scooter-table-body">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+            <button onclick="reportResult()">Report Result</button>
+        </div>
+    </main>
+
+    <script>
+        function fetchDataAndPopulateContainers() {
+            // Fetch reported scooter IDs
+            fetch("/api/all_reports")
+                .then(response => response.json())
+                .then(reports => {
+                    const reportedScooterIds = reports.map(report => report.scooter_id);
+                    // Fetch scooters with reported IDs
+                    fetch("/api/all_scooters")
+                        .then(response => response.json())
+                        .then(scooters => {
+                            const filteredScooters = scooters.filter(scooter => reportedScooterIds.includes(scooter.scooter_id));
+                            const scooterTableBody = document.getElementById("scooter-table-body");
+                            scooterTableBody.innerHTML = generateHTMLForScooters(filteredScooters);
+                        })
+                        .catch(error => {
+                            console.error("Error fetching scooters:", error);
+                        });
+                })
+                .catch(error => {
+                    console.error("Error fetching reported scooter IDs:", error);
+                });
+
+
+            // Fetch scooters
+            fetch("/api/all_scooters")
+                .then(response => response.json())
+                .then(scooters => {
+                    const scooterTableBody = document.getElementById("scooter-table-body");
+                    scooterTableBody.innerHTML = generateHTMLForScooters(scooters);
+                })
+                .catch(error => {
+                    console.error("Error fetching scooters:", error);
+                });
+        }
+
+
+        // Call the function to fetch and populate data when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchDataAndPopulateContainers();
+        });
+
+        let scooters = [];
+        function generateHTMLForScooters(scooters) {
+            let html = "<table class='table table-bordered'>";
+            html += "<thead><tr><th>Scooter ID</th><th>Status</th><th>Make</th><th>Color</th><th>Location</th><th>Power</th><th>Cost</th></tr></thead>";
+            html += "<tbody>";
+
+            scooters.forEach(scooter => {
+                html += "<tr>";
+                html += `<td>${scooter.scooter_id}</td>`;
+                html += `<td>${scooter.status}</td>`;
+                html += `<td>${scooter.make}</td>`;
+                html += `<td>${scooter.color}</td>`;
+                html += `<td>${scooter.location}</td>`;
+                html += `<td>${scooter.power}</td>`;
+                html += `<td>${scooter.cost}</td>`;
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+            return html;
+        }
+        function editScooter() {
+            const scooterId = prompt("Enter the ID of the scooter to edit:");
+
+            if (scooterId) {
+                // Prompt for updated scooter data and create a scooterData object
+                const status = prompt("Enter updated status:");
+                const make = prompt("Enter updated make:");
+                const color = prompt("Enter updated color:");
+                const location = prompt("Enter updated location:");
+                const power = parseFloat(prompt("Enter updated power remaining:"));
+                const cost = parseFloat(prompt("Enter updated cost per minute:"));
+
+                if (status && make && color && location && !isNaN(power) && !isNaN(cost)) {
+                    const scooterData = {
+                        scooter_id: scooterId,
+                        status,
+                        make,
+                        color,
+                        location,
+                        power,
+                        cost,
+                    };
+
+                    fetch("/api/edit_scooter", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(scooterData),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            alert(data); // Display a success message or handle the response as needed
+                        })
+                        .catch((error) => {
+                            console.error("Error editing scooter:", error);
+                            alert("An error occurred while editing the scooter.");
+                        });
+                } else {
+                    alert("Invalid input for scooter data. Please check and try again.");
+                }
+            }
+        }
+
+
+        // Add this code to your existing <script> block
+        function reportResult() {
+
+            const scooterId = prompt("Enter the ID of the scooter to edit:");
+
+            if (scooterId) {
+                // Prompt for updated scooter data and create a scooterData object
+                const description = prompt("Enter updated description:");
+                const time_of_repair = prompt("Enter time_of_repair:");
+                const linked_report_id = prompt("Enter linked_report_id:");
+
+                if (description && time_of_repair && linked_report_id) {
+                    const scooterData = {
+                        scooter_id: scooterId,
+                        description,
+                        time_of_repair,
+                        linked_report_id
+                    };
+
+                    fetch("/api/new_repair", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(scooterData),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            alert(data); // Display a success message or handle the response as needed
+                        })
+                        .catch((error) => {
+                            console.error("Error editing scooter:", error);
+                            alert("An error occurred while editing the scooter.");
+                        });
+                } else {
+                    alert("No scooter selected to report.");
+                }
+            }
+        }
+    </script>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+
+
+
+</html>

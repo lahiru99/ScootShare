@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Sign Up Form by Colorlib</title>
+
+  <link rel="stylesheet" href="fonts/material-icon/css/material-design-iconic-font.min.css">
+
+  <link rel="stylesheet" href="/static/css/register.css">
+  <meta name="robots" content="noindex, follow">
+  <script
+    nonce="7573602d-08f1-4926-b8e4-abee1b6461a4">(function (w, d) { !function (a, b, c, d) { a[c] = a[c] || {}; a[c].executed = []; a.zaraz = { deferred: [], listeners: [] }; a.zaraz.q = []; a.zaraz._f = function (e) { return async function () { var f = Array.prototype.slice.call(arguments); a.zaraz.q.push({ m: e, a: f }) } }; for (const g of ["track", "set", "debug"]) a.zaraz[g] = a.zaraz._f(g); a.zaraz.init = () => { var h = b.getElementsByTagName(d)[0], i = b.createElement(d), j = b.getElementsByTagName("title")[0]; j && (a[c].t = b.getElementsByTagName("title")[0].text); a[c].x = Math.random(); a[c].w = a.screen.width; a[c].h = a.screen.height; a[c].j = a.innerHeight; a[c].e = a.innerWidth; a[c].l = a.location.href; a[c].r = b.referrer; a[c].k = a.screen.colorDepth; a[c].n = b.characterSet; a[c].o = (new Date).getTimezoneOffset(); if (a.dataLayer) for (const n of Object.entries(Object.entries(dataLayer).reduce(((o, p) => ({ ...o[1], ...p[1] })), {}))) zaraz.set(n[0], n[1], { scope: "page" }); a[c].q = []; for (; a.zaraz.q.length;) { const q = a.zaraz.q.shift(); a[c].q.push(q) } i.defer = !0; for (const r of [localStorage, sessionStorage]) Object.keys(r || {}).filter((t => t.startsWith("_zaraz_"))).forEach((s => { try { a[c]["z_" + s.slice(7)] = JSON.parse(r.getItem(s)) } catch { a[c]["z_" + s.slice(7)] = r.getItem(s) } })); i.referrerPolicy = "origin"; i.src = "/cdn-cgi/zaraz/s.js?z=" + btoa(encodeURIComponent(JSON.stringify(a[c]))); h.parentNode.insertBefore(i, h) };["complete", "interactive"].includes(b.readyState) ? zaraz.init() : a.addEventListener("DOMContentLoaded", zaraz.init) }(w, d, "zarazData", "script"); })(window, document);</script>
+</head>
+
+<body>
+  <div class="main">
+
+
+    <section class="sign-in">
+      <div class="container">
+        <div class="signin-content">
+          <div class="signin-image">
+            <figure>
+              <img src="/static/images/scooter.jpg" alt="sing up image" style="width: 800px; height: 300px;">
+            </figure>
+          </div>
+          <div class="signin-form">
+            <h2 class="form-title">Log In</h2>
+            <form action="{{ url_for('site.login_view') }}" method="POST" class="register-form" id="login-form">
+              <div class="form-group">
+                <label for="your_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                <input type="text" name="username" id="username" placeholder="Your username" />
+              </div>
+              <div class="form-group">
+                <label for="password"><i class="zmdi zmdi-lock"></i></label>
+                <input type="password" name="password" id="password" placeholder="Password" />
+              </div>
+              <div class="form-group">
+                <input type="checkbox" id="show-password" class="agree-term" />
+                <label for="show-password" class="label-agree-term"><span><span></span></span>Show Password</label>
+              </div>
+              <div class="form-group form-button">
+                <input type="submit" name="signin" id="signin" class="form-submit" value="Log in" />
+              </div>
+              <a href="{{ url_for('site.register_view') }}">Create an account</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const url = "/api/login";
+      const formData = new FormData(this);
+
+      const formDataObject = {};
+      formData.forEach((value, key) => {
+        formDataObject[key] = value;
+      });
+
+      // Check if the username starts with '~' or '_'
+      const username = formData.get("username");
+      if (username && username.startsWith('~')) {
+        // You can set a custom field in the data to indicate the user type
+        formData.append("user_type", "admin");
+      } else if (username && username.startsWith('_')) {
+        formData.append("user_type", "engineer");
+      } else {
+        formData.append("user_type", "customer");
+      }
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formDataObject),
+      })
+        .then(async (response) => {
+          if (response.status === 200) {
+            const user_data = await response.json(); // Assuming the response contains JSON data
+            sessionStorage.setItem("username", user_data["username"]);
+            sessionStorage.setItem("user_type", user_data["user_type"]);
+            console.log("Success");
+
+            // Redirect based on user_type
+            const user_type = formData.get("user_type");
+            if (user_type === "admin") {
+              window.location.href = "/dashboard"; // Redirect to the dashboard for admin.
+            } else if (user_type === "engineer") {
+              window.location.href = "/engineer_dashboard"; // Redirect to the dashboard for engineer.
+            } else {
+              window.location.href = "/booking"; // Redirect to the booking page for regular customers.
+            }
+          } else {
+            const errorMessage = await response.text();
+            console.error("Error:", response.status, errorMessage);
+            // Display the error message to the user on the login page.
+            // You can update the DOM to show an error message here.
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+
+    document.getElementById("show-password").addEventListener("change", function () {
+      const passwordInput = document.getElementById("password");
+      if (this.checked) {
+        passwordInput.type = "text";
+      } else {
+        passwordInput.type = "password";
+      }
+    });
+  </script>
+
+
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="js/main.js"></script>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-23581568-13');
+  </script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8b253dfea2ab4077af8c6f58422dfbfd1689876627854"
+    integrity="sha512-bjgnUKX4azu3dLTVtie9u6TKqgx29RBwfj3QXYt5EKfWM/9hPSAI/4qcV5NACjwAo8UtTeWefx6Zq5PHcMm7Tg=="
+    data-cf-beacon='{"rayId":"80a860195b154f3c","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2023.8.0","si":100}'
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
